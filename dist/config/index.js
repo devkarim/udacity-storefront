@@ -2,8 +2,8 @@
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-exports.__esModule = true;
-var dotenv_1 = __importDefault(require("dotenv"));
-dotenv_1["default"].config();
-var config = process.env;
-exports["default"] = config;
+Object.defineProperty(exports, "__esModule", { value: true });
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
+const config = process.env;
+exports.default = config;
