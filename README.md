@@ -31,6 +31,15 @@ You can test the project overall via `yarn test`. This test includes model testi
 
 Check the project docs & data shapes from [here](https://github.com/devkarim/udacity-storefront/blob/main/REQUIREMENTS.md).
 
+## Technologies & Libraries Used
+
+- PostgreSQL as the database and express as the server.
+- dotenv - Retrieving env variables.
+- bcrypt - Hashing sensitive information.
+- jsonwebtoken - Generating and verifying authentication tokens.
+- jasmine - Testing the codebase.
+- db-migrate - Database migrations.
+
 ## See also
 
 - `yarn watch` - Watches for file changes and restarts project upon.
