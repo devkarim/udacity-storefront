@@ -29,7 +29,7 @@ You can test the project overall via `yarn test`. This test includes model testi
 
 ## Documentation
 
-Check the project docs from [here](https://github.com/devkarim/udacity-storefront/blob/main/DOCS.md).
+Check the project docs from [here](https://github.com/devkarim/udacity-storefront/blob/main/REQUIREMENTS.md).
 
 ## See also
 
