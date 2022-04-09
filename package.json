@@ -5,17 +5,21 @@
   "main": "server.ts",
   "scripts": {
     "start": "tsc && SET ENV=test & node dist/server.js",
-    "watch": "tsc-watch --esModuleInterop src/server.ts --outDir ./dist --onSuccess \"node ./dist/server.js\"",
-    "test": "SET ENV=test && tsc && yarn db-up --env test && jasmine-ts",
+    "watch": "tsc-watch -p ./tsconfig.json --onSuccess \"node ./dist/server.js\"",
+    "jasmine": "jasmine",
+    "test": "SET ENV=test && tsc && yarn db-up --env test && yarn jasmine",
     "tsc": "tsc",
     "db-up": "db-migrate up",
-    "db-down": "db-migrate down"
+    "db-down": "db-migrate down",
+    "db-create": "db-migrate db:create storefront && db-migrate db:create storefront_test",
+    "db-drop": "db-migrate db:drop storefront && db-migrate db:drop storefront_test"
   },
   "author": "Udacity",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.0.1",
     "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
     "db-migrate-pg": "^1.2.2",
     "dotenv": "^16.0.0",
     "express": "^4.17.1",
@@ -24,6 +28,7 @@
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
+    "@types/cors": "^2.8.12",
     "@types/dotenv": "^8.2.0",
     "@types/express": "^4.17.9",
     "@types/jasmine": "^3.6.3",
@@ -32,7 +37,6 @@
     "@types/supertest": "^2.0.12",
     "jasmine": "^3.6.4",
     "jasmine-spec-reporter": "^7.0.0",
-    "jasmine-ts": "^0.3.0",
     "supertest": "^6.2.2",
     "ts-node": "^9.1.1",
     "tsc-watch": "^4.2.9",

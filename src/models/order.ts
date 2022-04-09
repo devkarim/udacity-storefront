@@ -21,6 +21,18 @@ export class OrderStore {
     }
   }
 
+  async get(id: number): Promise<Order> {
+    try {
+      const sql = 'SELECT * FROM orders WHERE id=$1';
+      const conn = await db.connect();
+      const res = await conn.query(sql, [id]);
+      conn.release();
+      return res.rows[0];
+    } catch (err) {
+      throw new InternalServerError(`Could not get order: ${err}`);
+    }
+  }
+
   async getCurrentByUser(id: number): Promise<Order[]> {
     try {
       const sql = 'SELECT * FROM orders WHERE user_id=$1';

@@ -14,6 +14,30 @@ const userOrders = async (req: Request, res: Response) => {
   }
 };
 
+const createOrder = async (req: Request, res: Response) => {
+  try {
+    const order = await store.create(req.userId!);
+    res.json(order);
+  } catch (err) {
+    res.status(400).json(err);
+  }
+};
+
+const completeOrder = async (req: Request, res: Response) => {
+  try {
+    const orderId = parseInt(req.params.id);
+    const order = await store.get(orderId);
+    if (!order || order.user_id != req.userId!.toString())
+      return res
+        .status(400)
+        .json({ success: false, message: 'Order not owned.' });
+    const completedOrder = await store.complete(orderId);
+    res.json(completedOrder);
+  } catch (err) {
+    res.status(400).json(err);
+  }
+};
+
 const userCompletedOrders = async (req: Request, res: Response) => {
   try {
     const userId = parseInt(req.params.id);
@@ -25,6 +49,8 @@ const userCompletedOrders = async (req: Request, res: Response) => {
 };
 
 const orderRoutes = (app: express.Application) => {
+  app.post('/orders', checkAuth, createOrder);
+  app.post('/order/:id/complete', checkAuth, completeOrder);
   app.get('/user/:id/orders', checkAuth, userOrders);
   app.get('/user/:id/orders/completed', checkAuth, userCompletedOrders);
 };

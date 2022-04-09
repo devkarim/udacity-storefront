@@ -3,6 +3,7 @@ import supertest from 'supertest';
 import { AuthenticatedUser, User } from '../../models/user';
 import app from '../../server';
 import { Order, OrderStore } from '../../models/order';
+import { OrderStatus } from '../../models/enums';
 
 const req = supertest(app);
 const userStore = new UserStore();
@@ -30,9 +31,16 @@ describe('Order Endpoints', () => {
     expect(data.user.username).toEqual(u.username);
   });
 
-  it('should get user orders', async () => {
-    const order = await orderStore.create(u.id!);
+  it('should create order', async () => {
+    const res = await req
+      .post(`/orders`)
+      .set('Authorization', `Bearer ${token}`);
+    const order: Order = res.body;
     order_id = order.id!;
+    expect(order.user_id).toEqual(u.id!.toString());
+  });
+
+  it('should get user orders', async () => {
     const res = await req
       .get(`/user/${u.id}/orders`)
       .set('Authorization', `Bearer ${token}`);
@@ -46,6 +54,21 @@ describe('Order Endpoints', () => {
       .set('Authorization', `Bearer ${token}`);
     const data: Order[] = res.body;
     expect(data.length).toEqual(0);
+  });
+
+  it('should complete order', async () => {
+    const res = await req
+      .post(`/order/${order_id}/complete`)
+      .set('Authorization', `Bearer ${token}`);
+    const completedOrder: Order = res.body;
+    expect(completedOrder.status).toEqual(OrderStatus.COMPLETE);
+  });
+
+  it('should not complete orders as it does not exist', async () => {
+    const res = await req
+      .post(`/order/0/complete`)
+      .set('Authorization', `Bearer ${token}`);
+    expect(res.statusCode).toEqual(400);
   });
 
   it('should get user completed orders', async () => {

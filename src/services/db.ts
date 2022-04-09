@@ -12,7 +12,8 @@ const {
 
 const db = new Pool({
   host: POSTGRES_HOST,
-  database: ENV == 'test' ? POSTGRES_DB_TEST : POSTGRES_DB,
+  database:
+    ENV?.trim().toLowerCase() == 'test' ? POSTGRES_DB_TEST : POSTGRES_DB,
   user: POSTGRES_USER,
   password: POSTGRES_PASSWORD,
 });

@@ -1,6 +1,7 @@
+import { DashboardQueries, OrderProduct } from './../../services/dashboard';
 import { ProductCategory } from './../../models/enums';
 import { Product, ProductStore } from './../../models/product';
-import { UserStore } from './../../models/user';
+import { UserStore, ReadableUser } from './../../models/user';
 import supertest from 'supertest';
 import { AuthenticatedUser, User } from '../../models/user';
 import app from '../../server';
@@ -10,6 +11,7 @@ const req = supertest(app);
 const userStore = new UserStore();
 const productStore = new ProductStore();
 const orderStore = new OrderStore();
+const dashboard = new DashboardQueries();
 
 describe('Dashboard Endpoints', () => {
   const u: User = {
@@ -19,13 +21,13 @@ describe('Dashboard Endpoints', () => {
     password: 'test123',
   };
 
-  const p: Product = {
+  let p: Product = {
     name: 'Airpods',
     price: 399,
     category: ProductCategory.ELECTRONICS,
   };
 
-  const p2: Product = {
+  let p2: Product = {
     name: 'Airpods Pro',
     price: 599,
     category: ProductCategory.ELECTRONICS,
@@ -33,6 +35,7 @@ describe('Dashboard Endpoints', () => {
 
   let token: string;
   let order_id: number;
+  let orderProduct: OrderProduct;
 
   it('should authenticate user', async () => {
     const authUser = await userStore.create(u);
@@ -46,8 +49,8 @@ describe('Dashboard Endpoints', () => {
   });
 
   it('should get most expensive products', async () => {
-    await productStore.create(p);
-    await productStore.create(p2);
+    p = await productStore.create(p);
+    p2 = await productStore.create(p2);
     const res = await req.get('/expensive');
     const data: Product[] = res.body;
     expect(data[1].name).toEqual(p.name);
@@ -61,7 +64,38 @@ describe('Dashboard Endpoints', () => {
     expect(data.length).toEqual(2);
   });
 
+  it('should add product when authenticated', async () => {
+    order_id = (await orderStore.create(u.id!)).id!;
+    const res = await req
+      .post(`/products/orders`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        product_id: p.id,
+        order_id,
+        quantity: 5,
+      });
+    orderProduct = res.body;
+    expect(orderProduct.quantity).toEqual(5);
+  });
+
+  it('should get products in order', async () => {
+    const res = await req
+      .get(`/products_in_orders`)
+      .set('Authorization', `Bearer ${token}`);
+    const products: Product[] = res.body;
+    expect(products[0].price).toEqual(399);
+  });
+
+  it('should get users with orders', async () => {
+    const res = await req
+      .get(`/users_with_orders`)
+      .set('Authorization', `Bearer ${token}`);
+    const users: ReadableUser[] = res.body;
+    expect(users[0].username).toEqual(u.username);
+  });
+
   afterAll(async () => {
+    await dashboard.deleteOrderProduct(orderProduct.id!);
     await orderStore.clear();
     await productStore.clear();
     await userStore.delete(u.username);

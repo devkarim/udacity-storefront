@@ -12,8 +12,10 @@ export interface User {
   password: string;
 }
 
+export interface ReadableUser extends Omit<User, 'password'> {}
+
 export interface AuthenticatedUser {
-  user: User;
+  user: ReadableUser;
   token: string;
 }
 
@@ -33,7 +35,7 @@ export class UserStore {
   async get(id: number): Promise<User> {
     try {
       const sql =
-        'SELECT username, first_name, last_name FROM users WHERE id=$1';
+        'SELECT id, username, first_name, last_name FROM users WHERE id=$1';
       const conn = await db.connect();
       const res = await conn.query(sql, [id]);
       conn.release();
@@ -46,7 +48,7 @@ export class UserStore {
   async create(u: User): Promise<AuthenticatedUser> {
     try {
       const sql =
-        'INSERT INTO users (username, first_name, last_name, password) VALUES($1, $2, $3, $4) RETURNING *';
+        'INSERT INTO users (username, first_name, last_name, password) VALUES($1, $2, $3, $4) RETURNING id, username, first_name, last_name';
       const conn = await db.connect();
       const hashed_password = bcrypt.hashSync(
         u.password + config.BCRYPT_SECRET,
@@ -59,7 +61,7 @@ export class UserStore {
         hashed_password,
       ]);
       conn.release();
-      return { user: res.rows[0], token: generateToken({ user_id: u.id }) };
+      return { user: res.rows[0], token: generateToken({ user_id: u.id! }) };
     } catch (err) {
       throw new InternalServerError(`Could not create user: ${err}`);
     }
@@ -70,17 +72,38 @@ export class UserStore {
     password: string
   ): Promise<AuthenticatedUser | null> {
     try {
-      const user = await this.getByName(username);
-      if (!user) return null;
-      if (!bcrypt.compareSync(password + config.BCRYPT_SECRET, user.password))
+      const u = await this.getFullByName(username);
+      if (!u) return null;
+      if (!bcrypt.compareSync(password + config.BCRYPT_SECRET, u.password))
         return null;
-      return { user, token: generateToken({ user_id: user.id }) };
+      return {
+        user: {
+          id: u.id,
+          username: u.username,
+          first_name: u.first_name,
+          last_name: u.last_name,
+        },
+        token: generateToken({ user_id: u.id! }),
+      };
     } catch (err) {
       throw new InternalServerError(`Could not authenticate user: ${err}`);
     }
   }
 
-  async getByName(username: string): Promise<User> {
+  async getByName(username: string): Promise<ReadableUser> {
+    try {
+      const sql =
+        'SELECT id, username, first_name, last_name FROM users WHERE username=$1';
+      const conn = await db.connect();
+      const res = await conn.query(sql, [username]);
+      conn.release();
+      return res.rows[0];
+    } catch (err) {
+      throw new InternalServerError(`Could not get user by username: ${err}`);
+    }
+  }
+
+  async getFullByName(username: string): Promise<User> {
     try {
       const sql = 'SELECT * FROM users WHERE username=$1';
       const conn = await db.connect();

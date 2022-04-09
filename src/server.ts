@@ -1,5 +1,6 @@
 import express, { Request, Response } from 'express';
 import bodyParser from 'body-parser';
+import cors from 'cors';
 import config from './config';
 import { ADDRESS } from './config/constants';
 import productRoutes from './handlers/productRoutes';
@@ -9,6 +10,7 @@ import dashboardRoutes from './handlers/dashboardRoutes';
 
 const app: express.Application = express();
 
+app.use(cors());
 app.use(bodyParser.json());
 
 app.get('/', function (_req: Request, res: Response) {
