@@ -174,9 +174,9 @@ Returns created order product. Response example:
 
 `{ id: 1, quantity: 5, order_id: "1", product_id: "1" }`
 
-## Data Shapes
+# Data Shapes
 
-### Product
+## Product
 
 | Param    | Type   | Description              |
 | -------- | ------ | ------------------------ |
@@ -185,7 +185,7 @@ Returns created order product. Response example:
 | price    | number | Price of the product.    |
 | category | string | Category of the product. |
 
-### User
+## User
 
 | Param      | Type   | Description             |
 | ---------- | ------ | ----------------------- |
@@ -195,7 +195,7 @@ Returns created order product. Response example:
 | last_name  | string | Last name of the user.  |
 | password   | string | Password of the user.   |
 
-### Orders
+## Orders
 
 | Param   | Type   | Description                        |
 | ------- | ------ | ---------------------------------- |

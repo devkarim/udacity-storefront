@@ -29,7 +29,7 @@ You can test the project overall via `yarn test`. This test includes model testi
 
 ## Documentation
 
-Check the project docs from [here](https://github.com/devkarim/udacity-storefront/blob/main/REQUIREMENTS.md).
+Check the project docs & data shapes from [here](https://github.com/devkarim/udacity-storefront/blob/main/REQUIREMENTS.md).
 
 ## See also
 
@@ -39,4 +39,4 @@ Check the project docs from [here](https://github.com/devkarim/udacity-storefron
 - `yarn db-create` - Create databases associated with env vars.
 - `yarn db-drop` - Drop databases associated with env vars.
 
-NOTE: The scripts inside package.json are compatible with Windows!
+NOTE: The scripts inside package.json are compatible with Windows only!
